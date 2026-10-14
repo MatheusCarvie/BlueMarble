@@ -4,6 +4,7 @@ project(BlueMarble)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(OpenGL REQUIRED)
 
@@ -14,15 +15,14 @@ add_executable(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
     deps/glad/include
-    deps/glfw/include
     deps/glm/include
 )
 
-target_link_directories(${PROJECT_NAME} PRIVATE 
-    deps/glfw/lib
-)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE 
-    glfw3.lib
-    OpenGL::GL
-)
+if(WIN32)
+    target_include_directories(${PROJECT_NAME} PRIVATE deps/glfw/include)
+    target_link_directories(${PROJECT_NAME} PRIVATE deps/glfw/lib)
+    target_link_libraries(${PROJECT_NAME} PRIVATE glfw3 OpenGL::GL)
+else()
+    find_package(glfw3 3.3 REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE glfw OpenGL::GL)
+endif()
